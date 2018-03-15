@@ -62,6 +62,7 @@ import           Data.Tuple
 import           Lndr.NetworkStatistics
 import           Lndr.Types
 import           Lndr.Util
+import           Network.Ethereum.Transaction
 import           Network.Ethereum.Web3
 import qualified Network.Ethereum.Web3.Eth   as Eth
 import           Network.Ethereum.Web3.TH
@@ -80,7 +81,8 @@ finalizeTransaction config (BilateralCreditRecord (CreditRecord creditor debtor 
           (sig2r, sig2s, sig2v) = decomposeSig sig2
           encodedMemo :: BytesN 32
           encodedMemo = BytesN . BA.convert . T.encodeUtf8 $ memo
-      runWeb3 $ issueCredit callVal
+      runWeb3 . Eth.sendRawTransaction . (\x -> fromMaybe (error "bad tx") $ createRawTransaction x 9 1 "7920ca01d3d1ac463dfd55b5ddfdcbb64ae31830f31be045ce2d51a305516a37")
+              $ issueCredit callVal
                             ucac
                             creditor debtor (UIntN amount)
                             (sig1r :< sig1s :< sig1v :< NilL)

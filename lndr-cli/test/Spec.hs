@@ -19,7 +19,6 @@ import           Lndr.Types
 import           Lndr.Util                      ( parseIssueCreditInput,
                                                   textToAddress,
                                                   addHexPrefix)
-import           Lndr.Web3
 import           Network.Ethereum.Web3
 import qualified Network.Ethereum.Web3.Eth      as Eth
 import           Network.Ethereum.Web3.Types
@@ -305,12 +304,12 @@ basicSettlementTest = do
     let settleAmount = fmap Quantity . settlementAmount . creditRecord $ head bilateralPendingSettlements
 
     -- user5 transfers eth to user6
-    txHashE <- runLndrWeb3 $ Eth.sendTransaction $ Call (Just testAddress5)
-                                                        testAddress6
-                                                        (Just 21000)
-                                                        Nothing
-                                                        settleAmount
-                                                        Nothing
+    txHashE <- runWeb3 $ Eth.sendTransaction $ Call (Just testAddress5)
+                                                    testAddress6
+                                                    (Just 21000)
+                                                    Nothing
+                                                    settleAmount
+                                                    Nothing
 
     let txHash = fromRight (error "error sending eth") txHashE
 
@@ -339,19 +338,19 @@ basicSettlementTest = do
 verifySettlementTest :: Assertion
 verifySettlementTest = do
 
-    syncingE <- runLndrWeb3 Eth.syncing
+    syncingE <- runWeb3 Eth.syncing
     assertEqual "confirm that blockchain is synced" syncingE (Right NotSyncing)
 
     (ucacAddr, _, _) <- loadUcacs
     let settleAmountInWei = 10 ^ 18
     -- testAddress1 is the person revieving eth, thus the credit must record
     -- this address as the debtor.
-    txHashE <- runLndrWeb3 $ Eth.sendTransaction $ Call (Just testAddress4)
-                                                        testAddress1
-                                                        (Just 21000)
-                                                        Nothing
-                                                        (Just settleAmountInWei)
-                                                        Nothing
+    txHashE <- runWeb3 $ Eth.sendTransaction $ Call (Just testAddress4)
+                                                    testAddress1
+                                                    (Just 21000)
+                                                    Nothing
+                                                    (Just settleAmountInWei)
+                                                    Nothing
     let txHash = fromRight (error "error sending eth") txHashE
 
     threadDelay (5 * 10 ^ 6)
