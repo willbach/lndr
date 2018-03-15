@@ -37,7 +37,6 @@ import           Lndr.EthereumInterface
 import           Lndr.Handler
 import           Lndr.NetworkStatistics
 import           Lndr.Types
-import           Lndr.Web3
 import           Network.Ethereum.Web3      hiding (convert)
 import           Network.HTTP.Types
 import           Network.Wai
@@ -168,9 +167,9 @@ app state = serve lndrAPI (readerServer state)
 updateDbFromLndrLogs :: ServerState -> IO ()
 updateDbFromLndrLogs (ServerState pool configTVar _) = void $ do
     config <- atomically $ readTVar configTVar
-    logs <- runLndrWeb3 $ join <$> sequence [ lndrLogs config "USD" Nothing Nothing
-                                            , lndrLogs config "JPY" Nothing Nothing
-                                            , lndrLogs config "KRW" Nothing Nothing ]
+    logs <- runWeb3 $ join <$> sequence [ lndrLogs config "USD" Nothing Nothing
+                                        , lndrLogs config "JPY" Nothing Nothing
+                                        , lndrLogs config "KRW" Nothing Nothing ]
     withResource pool . Db.insertCredits $ either (const []) id logs
 
 

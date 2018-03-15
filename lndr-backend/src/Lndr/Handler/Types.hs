@@ -9,7 +9,6 @@ import qualified Data.ByteString.Char8      as B (pack)
 import qualified Data.ByteString.Lazy       as B (fromStrict)
 import           Data.Either.Combinators    (mapLeft)
 import           Lndr.Types
-import           Lndr.Web3
 import           Network.Ethereum.Web3
 import           Servant
 
@@ -21,8 +20,8 @@ liftEither :: MonadError e m => Either e a -> m a
 liftEither = either throwError return
 
 
-lndrWeb3 :: Web3 LndrProvider b -> LndrHandler b
-lndrWeb3 = ioEitherToLndr . runLndrWeb3
+lndrWeb3 :: Web3 b -> LndrHandler b
+lndrWeb3 = ioEitherToLndr . runWeb3
 
 
 eitherToLndr :: Show a => String -> Either a b -> LndrHandler b

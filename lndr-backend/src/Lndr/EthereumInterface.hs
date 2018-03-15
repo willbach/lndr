@@ -62,7 +62,6 @@ import           Data.Tuple
 import           Lndr.NetworkStatistics
 import           Lndr.Types
 import           Lndr.Util
-import           Lndr.Web3
 import           Network.Ethereum.Web3
 import qualified Network.Ethereum.Web3.Eth   as Eth
 import           Network.Ethereum.Web3.TH
@@ -81,12 +80,12 @@ finalizeTransaction config (BilateralCreditRecord (CreditRecord creditor debtor 
           (sig2r, sig2s, sig2v) = decomposeSig sig2
           encodedMemo :: BytesN 32
           encodedMemo = BytesN . BA.convert . T.encodeUtf8 $ memo
-      runLndrWeb3 $ issueCredit callVal
-                                ucac
-                                creditor debtor (UIntN amount)
-                                (sig1r :< sig1s :< sig1v :< NilL)
-                                (sig2r :< sig2s :< sig2v :< NilL)
-                                encodedMemo
+      runWeb3 $ issueCredit callVal
+                            ucac
+                            creditor debtor (UIntN amount)
+                            (sig1r :< sig1s :< sig1v :< NilL)
+                            (sig2r :< sig2s :< sig2v :< NilL)
+                            encodedMemo
     where callVal = def { callFrom = Just $ executionAddress config
                         , callTo = creditProtocolAddress config
                         , callGasPrice = Just . Quantity $ gasPrice config
@@ -98,8 +97,8 @@ finalizeTransaction config (BilateralCreditRecord (CreditRecord creditor debtor 
 -- | Scan blockchain for 'IssueCredit' events emitted by the Credit Protocol
 -- smart contract. If 'Just addr' values are passed in for either 'creditorM'
 -- or 'debtorM', or both, logs are filtered to show matching results.
-lndrLogs :: Provider a => ServerConfig -> Text -> Maybe Address -> Maybe Address
-         -> Web3 a [IssueCreditLog]
+lndrLogs :: ServerConfig -> Text -> Maybe Address -> Maybe Address
+         -> Web3 [IssueCreditLog]
 lndrLogs config currencyKey creditorM debtorM = rights . fmap interpretUcacLog <$>
     Eth.getLogs (Filter (Just $ creditProtocolAddress config)
                         (Just [ Just (issueCreditEvent config)
@@ -135,7 +134,7 @@ interpretUcacLog change = do
 -- eth settlment amount.
 verifySettlementPayment :: BilateralCreditRecord -> IO (Either String ())
 verifySettlementPayment (BilateralCreditRecord creditRecord _ _ (Just txHash)) = do
-    transactionME <- runLndrWeb3 . Eth.getTransactionByHash $ addHexPrefix txHash
+    transactionME <- runWeb3 . Eth.getTransactionByHash $ addHexPrefix txHash
     case transactionME of
         Right (Just transaction) ->
             let fromMatch = txFrom transaction == creditor creditRecord
