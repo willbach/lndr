@@ -1,7 +1,6 @@
 {-# LANGUAGE OverloadedStrings     #-}
 
 module Lndr.CLI.Actions (
-      programModes
     , runMode
     , userFromSK
 
@@ -37,7 +36,7 @@ module Lndr.CLI.Actions (
     , getTwoPartyBalance
     , getCounterparties
     , getTransactions
-    , getSettlements
+    , getPendingSettlements
     , getTxHash
     , getTxHashFail
     , verifySettlement
@@ -66,9 +65,6 @@ import           Network.Ethereum.Util           (ecsign, hashPersonalMessage,
 import           Network.Ethereum.Web3
 import qualified Network.Ethereum.Web3.Address   as Addr
 import qualified Network.HTTP.Simple             as HTTP
-import           System.Console.CmdArgs          hiding (def)
-import           System.Console.CmdArgs.Explicit (HelpFormat (..), helpText,
-                                                  modeEmpty)
 import           Text.EmailAddress
 import qualified Text.Pretty.Simple              as Pr
 
@@ -146,8 +142,8 @@ getTransactions url address = do
     HTTP.getResponseBody <$> HTTP.httpJSON initReq
 
 
-getSettlements :: String -> Address -> IO SettlementsResponse
-getSettlements url address = do
+getPendingSettlements :: String -> Address -> IO SettlementsResponse
+getPendingSettlements url address = do
     initReq <- HTTP.parseRequest $ url ++ "/pending_settlements/" ++ show address
     HTTP.getResponseBody <$> HTTP.httpJSON initReq
 

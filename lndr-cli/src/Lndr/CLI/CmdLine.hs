@@ -36,9 +36,9 @@ data LndrCmd = Transactions
              deriving (Show, Data, Typeable)
 
 
-programModes = modes [ Transactions &= help "list all transactions processed by Lndr UCAC"
+programModes = modes [ Transactions &= help "list all transactions involving default user in default Lndr UCAC"
                      , Pending &= help "list all pending transactions"
-                     , RejectPending
+                     , RejectPending &= "start interactive credit rejection procss"
                      , Lend "0x8c12aab5ffbe1f95b890f60832002f3bbc6fa4cf"
                             123
                             "default"
@@ -55,6 +55,6 @@ programModes = modes [ Transactions &= help "list all transactions processed by 
                      , SetPhoto "image.jpeg"
                      , Unsubmitted &= help "prints txs that are in lndr db but not yet on the blockchain"
                      , Info &= help "prints config, nick, and friends"
-                     , Settlements &= help "list all settlements"
+                     , PendingSettlements &= help "list all pending settlements"
                      , LndrConfig &= help "prints config endpoint response"
-                     ] &= help "Lend and borrow money" &= program "lndr" &= summary "lndr v0.1"
+                     ] &= help "Lend and borrow money.\n Server URL, default user, and default ucac must be indicated in configuration file." &= program "lndr" &= summary "lndr v0.1"
