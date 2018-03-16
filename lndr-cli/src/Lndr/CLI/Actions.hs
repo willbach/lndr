@@ -1,6 +1,7 @@
 {-# LANGUAGE OverloadedStrings     #-}
 
 module Lndr.CLI.Actions (
+      programModes
     , runMode
     , userFromSK
 
@@ -120,8 +121,8 @@ runMode (Config url sk _) Info =
 runMode (Config url sk _) Unsubmitted =
     print =<< getUnsubmitted (LT.unpack url)
 
-runMode (Config url sk _) Settlements =
-    print =<< getSettlements (LT.unpack url) (textToAddress $ userFromSK sk)
+runMode (Config url sk _) PendingSettlements =
+    print =<< getPendingSettlements (LT.unpack url) (textToAddress $ userFromSK sk)
 
 runMode (Config url sk _) LndrConfig =
     print =<< getConfig (LT.unpack url)
