@@ -284,10 +284,6 @@ basicLendTest = do
 basicSettlementTest :: Assertion
 basicSettlementTest = do
     (ucacAddr, ucacAddrKRW, ucacAddrJPY) <- loadUcacs
-    pricesM <- runMaybeT queryEtheruemPrices
-    case pricesM of
-        Just prices -> assertBool "nonzero eth price retrieved from coinbase" (usd prices > 0)
-        Nothing -> return ()
 
     let testAmount = 2939
         testCredit' = CreditRecord testAddress5 testAddress6 testAmount "settlement" testAddress5 0 "" "" ucacAddr Nothing (Just "ETH") Nothing
