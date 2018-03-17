@@ -10,7 +10,7 @@ import           Data.Either.Combinators        (fromRight)
 import           Data.Maybe                     (fromJust)
 import qualified Data.Map                       as M
 import qualified Data.Text.Lazy                 as LT
-import           Lndr.CLI.Args
+import           Lndr.CLI.Actions
 import           Lndr.Config
 import           Lndr.EthereumInterface
 import           Lndr.NetworkStatistics
@@ -299,7 +299,7 @@ basicSettlementTest = do
     assertEqual "lend (settle) success" 204 httpCode
 
     -- check that pending settlement is registered in test
-    (SettlementsResponse pendingSettlements bilateralPendingSettlements) <- getSettlements testUrl testAddress5
+    (SettlementsResponse pendingSettlements bilateralPendingSettlements) <- getPendingSettlements testUrl testAddress5
     assertEqual "pre-confirmation: get pending settlements success" 1 (length pendingSettlements)
     assertEqual "pre-confirmation: get bilateral pending settlements success" 0 (length bilateralPendingSettlements)
 
@@ -307,7 +307,7 @@ basicSettlementTest = do
     httpCode <- submitCredit testUrl testPrivkey6 (testCredit { submitter = testAddress6 })
     assertEqual "borrow (settle) success" 204 httpCode
 
-    (SettlementsResponse pendingSettlements bilateralPendingSettlements) <- getSettlements testUrl testAddress5
+    (SettlementsResponse pendingSettlements bilateralPendingSettlements) <- getPendingSettlements testUrl testAddress5
     assertEqual "post-confirmation: get pending settlements success" 0 (length pendingSettlements)
     assertEqual "post-confirmation: get bilateral pending settlements success" 1 (length bilateralPendingSettlements)
 
@@ -334,7 +334,7 @@ basicSettlementTest = do
     -- heartbeat has time to verify its validity
     threadDelay (7 * 10 ^ 6)
 
-    (SettlementsResponse pendingSettlements bilateralPendingSettlements) <- getSettlements testUrl testAddress5
+    (SettlementsResponse pendingSettlements bilateralPendingSettlements) <- getPendingSettlements testUrl testAddress5
     assertEqual "post-verification: get pending settlements success" 0 (length pendingSettlements)
     assertEqual "post-verification: get bilateral pending settlements success" 0 (length bilateralPendingSettlements)
 

@@ -5,10 +5,14 @@ module Lndr.Util where
 
 import           Control.Exception
 import           Control.Lens
-import qualified Data.Bimap                    as B
+import           Control.Monad.Except
+import           Control.Monad.Trans.Except
+import qualified Data.Bimap                    as BM
 import qualified Data.ByteArray                as BA
-import qualified Data.ByteString               as B
+import qualified Data.ByteString               as B hiding (pack)
 import qualified Data.ByteString.Base16        as BS16
+import qualified Data.ByteString.Char8         as B (pack)
+import qualified Data.ByteString.Lazy          as B (fromStrict)
 import           Data.Either.Combinators       (fromRight, mapLeft)
 import qualified Data.Map                      as M
 import           Data.Maybe                    (fromMaybe, isNothing)
@@ -21,6 +25,11 @@ import qualified Network.Ethereum.Util         as EU
 import           Network.Ethereum.Web3
 import qualified Network.Ethereum.Web3.Address as Addr
 import           Numeric                       (readHex, showHex)
+import           Servant
+
+
+ioMaybeToExceptT :: String -> IO (Maybe a) -> ExceptT ServantErr IO  a
+ioMaybeToExceptT error = ExceptT . fmap (maybe (Left (err404 { errBody = B.fromStrict . B.pack $ error })) Right)
 
 
 hashCreditLog :: IssueCreditLog -> Text
@@ -118,14 +127,14 @@ alignR :: Text -> Text
 alignR = snd . align
 
 
-getUcac :: B.Bimap Text Address -> Maybe Text -> Address
+getUcac :: BM.Bimap Text Address -> Maybe Text -> Address
 getUcac ucacAddresses currency =
-    let defaultUcac = fromMaybe (error "no USD ucac registered") $ B.lookup "USD" ucacAddresses
-    in fromMaybe defaultUcac $ (`B.lookup` ucacAddresses) =<< currency
+    let defaultUcac = fromMaybe (error "no USD ucac registered") $ BM.lookup "USD" ucacAddresses
+    in fromMaybe defaultUcac $ (`BM.lookup` ucacAddresses) =<< currency
 
 
 configToResponse :: ServerConfig -> ConfigResponse
-configToResponse config = ConfigResponse (B.toMap $ lndrUcacAddrs config)
+configToResponse config = ConfigResponse (BM.toMap $ lndrUcacAddrs config)
                                          (creditProtocolAddress config)
                                          (gasPrice config) (ethereumPrices config)
                                          (latestBlockNumber config - 40600)

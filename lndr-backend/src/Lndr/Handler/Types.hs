@@ -10,6 +10,7 @@ import qualified Data.ByteString.Lazy       as B (fromStrict)
 import           Data.Either.Combinators    (mapLeft)
 import           Lndr.Types
 import           Lndr.Web3
+import           Lndr.Util
 import           Network.Ethereum.Web3
 import           Servant
 
@@ -34,4 +35,4 @@ ioEitherToLndr = LndrHandler . lift . ExceptT . fmap (mapLeft (\x -> err500 { er
 
 
 ioMaybeToLndr :: String -> IO (Maybe a) -> LndrHandler a
-ioMaybeToLndr error = LndrHandler . lift . ExceptT . fmap (maybe (Left (err404 { errBody = B.fromStrict . B.pack $ error })) Right)
+ioMaybeToLndr error = LndrHandler . lift . ioMaybeToExceptT error

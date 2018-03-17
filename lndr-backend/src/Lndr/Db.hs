@@ -27,7 +27,7 @@ module Lndr.Db (
     , allCredits
     , lookupCreditByAddress
     , counterpartiesByAddress
-    , lookupCreditByHash
+    , lookupSettlementCreditByHash
     , verifyCreditByHash
     , userBalance
     , twoPartyBalance

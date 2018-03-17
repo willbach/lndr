@@ -38,6 +38,7 @@ import           Lndr.Handler
 import           Lndr.NetworkStatistics
 import           Lndr.Types
 import           Lndr.Web3
+import           Lndr.Util
 import           Network.Ethereum.Web3      hiding (convert)
 import           Network.HTTP.Types
 import           Network.Wai
@@ -247,7 +248,7 @@ verifyIndividualRecord :: ServerState -> TransactionHash -> ExceptT ServantErr I
 verifyIndividualRecord (ServerState pool configTVar loggerSet) creditHash = do
     config <- liftIO $ atomically $ readTVar configTVar
     let settlementCreditError = "Hash does not refer to pending bilateral settlement record"
-    bilateralCreditRecord <- ioMaybeToLndr settlementCreditError $
+    bilateralCreditRecord <- ioMaybeToExceptT settlementCreditError $
                 withResource pool $ Db.lookupSettlementCreditByHash creditHash
     verifiedE <- liftIO $ verifySettlementPayment bilateralCreditRecord
     case verifiedE of

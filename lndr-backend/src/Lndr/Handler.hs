@@ -29,13 +29,16 @@ module Lndr.Handler (
 
     -- * Admin Handlers
     , unsubmittedHandler
-    , resubmitHandler
     , registerPushHandler
     , configHandler
 
     -- * Email Handlers
     , emailHandler
     , emailLookupHandler
+
+    -- * helpers
+    , ioMaybeToLndr
+    , ioEitherToLndr
     ) where
 
 import           Lndr.Handler.Admin
