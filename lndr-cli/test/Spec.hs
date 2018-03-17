@@ -368,23 +368,22 @@ verifySettlementTest = do
                                                         (Just settleAmountInWei)
                                                         Nothing
     let txHash = fromRight (error "error sending eth") txHashE
+        creditRecord = CreditRecord testAddress4
+                                    testAddress1
+                                    10
+                                    ""
+                                    testAddress4
+                                    0
+                                    ""
+                                    ""
+                                    ucacAddr
+                                    (Just $ unQuantity settleAmountInWei)
+                                    (Just "ETH")
+                                    (Just 0)
 
     threadDelay (5 * 10 ^ 6)
 
-    verified <- verifySettlementPayment (BilateralCreditRecord ( CreditRecord testAddress4
-                                                                              testAddress1
-                                                                              10
-                                                                              ""
-                                                                              testAddress4
-                                                                              0
-                                                                              ""
-                                                                              ""
-                                                                              ucacAddr
-                                                                              (Just $ unQuantity settleAmountInWei)
-                                                                              (Just "ETH")
-                                                                              (Just 0)
-                                                               ) "" "" (Just txHash))
-    -- txHash testAddress4 testAddress1 (10 ^ 18)
+    verified <- verifySettlementPayment (BilateralCreditRecord creditRecord "" "" (Just txHash))
     assertBool "payment properly verified" (isRight verified)
 
 
