@@ -355,7 +355,7 @@ registerChannel :: String -> Text -> PushRequest -> IO Int
 registerChannel url privateKey pushReq = do
     initReq <- HTTP.parseRequest $ url ++ "/register_push"
     let Right signature = generateSignature pushReq privateKey
-        req = HTTP.setRequestBodyJSON (pushReq {pushRequestSignature = signature }) $
+        req = HTTP.setRequestBodyJSON (pushReq { pushRequestSignature = signature }) $
                     HTTP.setRequestMethod "POST" initReq
     HTTP.getResponseStatusCode <$> HTTP.httpNoBody req
 
