@@ -246,10 +246,9 @@ verifySettlementsWithTxHash state@(ServerState pool configTVar _) = do
 verifyIndividualRecord :: ServerState -> TransactionHash -> ExceptT ServantErr IO ()
 verifyIndividualRecord (ServerState pool configTVar loggerSet) creditHash = do
     config <- liftIO $ atomically $ readTVar configTVar
-    recordM <- liftIO $ withResource pool $ Db.lookupCreditByHash creditHash
-    let recordNotFound = throwError $
-            err404 { errBody = "Credit hash does not refer to pending bilateral settlement record" }
-    bilateralCreditRecord <- maybe recordNotFound pure recordM
+    let settlementCreditError = "Hash does not refer to pending bilateral settlement record"
+    bilateralCreditRecord <- ioMaybeToLndr settlementCreditError $
+                withResource pool $ Db.lookupSettlementCreditByHash creditHash
     verifiedE <- liftIO $ verifySettlementPayment bilateralCreditRecord
     case verifiedE of
         -- TODO unify it with other finalizeTransaction
