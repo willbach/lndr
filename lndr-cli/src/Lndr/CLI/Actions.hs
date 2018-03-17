@@ -129,6 +129,8 @@ runMode (Config url sk _) LndrConfig =
 
 userFromSK = fromMaybe "" . privateToAddress . LT.toStrict
 
+-- TODO all cmdline actions should be put into `Reader Config` monad
+-- OR   we can use the servant autogen'd client code
 
 getUnsubmitted :: String -> IO (Int, Int, [(Text, IssueCreditLog)])
 getUnsubmitted url = do
